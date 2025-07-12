@@ -1,5 +1,5 @@
 'use client';
-import React from 'react';
+import React, { useRef } from 'react';
 import { useTypingEngine, Language, Difficulty } from './useTypingEngine';
 import Link from 'next/link';
 
@@ -24,6 +24,8 @@ export const TrialMode: React.FC<TrialModeProps> = ({ language, difficulty, time
     handleInput,
   } = useTypingEngine({ language, difficulty, mode: 'trial', timeLimit });
 
+  const inputRef = useRef<HTMLInputElement>(null);
+
   console.log('TrialMode - words length:', words.length, 'currentWord:', currentWord, 'isRunning:', isRunning);
 
   return (
@@ -40,7 +42,7 @@ export const TrialMode: React.FC<TrialModeProps> = ({ language, difficulty, time
       <div className="mb-2">残り時間: <span className="font-mono">{Math.max(0, timeLimit - stats.elapsed)} 秒</span></div>
       <div className="mb-4">
         {currentWord ? (
-          <span className="text-lg font-mono bg-gray-800 px-2 py-1 rounded">{currentWord}</span>
+          <span className="text-lg font-mono bg-gray-800 px-2 py-1 rounded" style={{ fontFamily: 'Fira Mono, monospace' }}>{currentWord}</span>
         ) : (
           <span className="text-lg font-mono bg-gray-800 px-2 py-1 rounded text-gray-400">
             {words.length > 0 ? '辞書を読み込み中...' : '辞書の読み込みに失敗しました'}
@@ -60,11 +62,18 @@ export const TrialMode: React.FC<TrialModeProps> = ({ language, difficulty, time
         }}
         disabled={!isRunning || isFinished}
         autoFocus
+        ref={inputRef}
+        style={{ fontFamily: 'Fira Mono, monospace' }}
       />
       <div className="flex gap-4 mt-4">
         <button
           className="px-4 py-2 bg-blue-600 rounded hover:bg-blue-700 disabled:opacity-50"
-          onClick={start}
+          onClick={() => {
+            start();
+            setTimeout(() => {
+              inputRef.current?.focus();
+            }, 0);
+          }}
           disabled={isRunning}
         >開始</button>
         <button

@@ -69,16 +69,21 @@ export function useTypingEngine({
     timerRef.current = setInterval(() => {
       setStats(s => {
         const elapsed = Math.floor((Date.now() - (startTimeRef.current || 0)) / 1000);
+        // --- 修正ここから ---
         if (mode === 'trial' && elapsed >= timeLimit) {
-          setIsFinished(true);
-          setIsRunning(false);
-          clearInterval(timerRef.current!);
+          if (!isFinished) {
+            setIsFinished(true);
+            setIsRunning(false);
+            clearInterval(timerRef.current!);
+            return { ...s, elapsed: timeLimit };
+          }
         }
+        // --- 修正ここまで ---
         return { ...s, elapsed };
       });
     }, 100);
     return () => clearInterval(timerRef.current!);
-  }, [isRunning, mode, timeLimit]);
+  }, [isRunning, mode, timeLimit, isFinished]);
 
   // 入力判定
   function handleInput(value: string) {
